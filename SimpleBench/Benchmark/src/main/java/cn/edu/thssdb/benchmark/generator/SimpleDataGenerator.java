@@ -1,6 +1,7 @@
 package cn.edu.thssdb.benchmark.generator;
 
 import cn.edu.thssdb.benchmark.common.Constants;
+import cn.edu.thssdb.benchmark.common.DataType;
 import cn.edu.thssdb.benchmark.common.TableSchema;
 
 import java.util.ArrayList;
@@ -15,10 +16,10 @@ public class SimpleDataGenerator extends BaseDataGenerator {
     for (int tableId = 0; tableId < Constants.tableCount; tableId++) {
       String tableName = "test_table" + tableId;
       List<String> columns = new ArrayList<>();
-      List<Integer> types = new ArrayList<>();
+      List<DataType> types = new ArrayList<>();
       for (int columnId = 0; columnId < Constants.columnCount; columnId++) {
         columns.add("column" + columnId);
-        types.add(columnId % Constants.columnTypes.length);
+        types.add(Constants.columnTypes[columnId % Constants.columnTypes.length]);
       }
       schemaMap.put(tableName, new TableSchema(tableName, columns, types, tableId));
     }
@@ -27,15 +28,15 @@ public class SimpleDataGenerator extends BaseDataGenerator {
   @Override
   public Object generateValue(String tableName, int rowId, int columnId) {
     switch (schemaMap.get(tableName).types.get(columnId)) {
-      case 0:
+      case INT:
         return rowId;
-      case 1:
+      case LONG:
         return (long) rowId;
-      case 2:
+      case DOUBLE:
         return (double) rowId;
-      case 3:
+      case FLOAT:
         return (float) rowId;
-      case 4:
+      case STRING:
         return String.format(stringFormat, rowId);
     }
     return null;

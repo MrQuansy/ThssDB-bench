@@ -2,6 +2,7 @@ package cn.edu.thssdb.benchmark.executor;
 
 import cn.edu.thssdb.benchmark.common.Client;
 import cn.edu.thssdb.benchmark.common.Constants;
+import cn.edu.thssdb.benchmark.common.DataType;
 import cn.edu.thssdb.benchmark.common.TableSchema;
 import cn.edu.thssdb.benchmark.generator.BaseDataGenerator;
 import cn.edu.thssdb.benchmark.generator.SimpleDataGenerator;
@@ -63,9 +64,7 @@ public class CRUDTestExecutor implements ITestExecutor {
       StringBuilder sb = new StringBuilder("CREATE TABLE " + tableSchema.tableName + " (");
       for (int columnId = 0; columnId < tableSchema.columns.size(); columnId++) {
         sb.append(
-            tableSchema.columns.get(columnId)
-                + " "
-                + Constants.columnTypes[tableSchema.types.get(columnId)]);
+            tableSchema.columns.get(columnId) + " " + tableSchema.types.get(columnId).getType());
         sb.append(",");
       }
       sb.append("primary key(" + tableSchema.columns.get(tableSchema.primaryKeyColumnIndex) + ")");
@@ -260,7 +259,7 @@ public class CRUDTestExecutor implements ITestExecutor {
     }
   }
 
-  private static Set<List<Object>> convertData(List<List<String>> data, List<Integer> type) {
+  private static Set<List<Object>> convertData(List<List<String>> data, List<DataType> type) {
     Set<List<Object>> result = new HashSet<>();
     int rowSize = data.size();
     int colSize = type.size();
@@ -269,22 +268,22 @@ public class CRUDTestExecutor implements ITestExecutor {
       List<String> stringRowData = data.get(rowId);
       List<Object> rowData = new ArrayList<>();
       for (int columnId = 0; columnId < colSize; columnId++) {
-        switch (Constants.columnTypes[type.get(columnId)]) {
-          case "int":
+        switch (type.get(columnId)) {
+          case INT:
             rowData.add(Integer.valueOf(stringRowData.get(columnId)));
             break;
-          case "long":
+          case LONG:
             rowData.add(Long.valueOf(stringRowData.get(columnId)));
             break;
-          case "float":
+          case FLOAT:
             rowData.add(Float.valueOf(stringRowData.get(columnId)));
             break;
-          case "double":
+          case DOUBLE:
             rowData.add(Double.valueOf(stringRowData.get(columnId)));
             break;
-          default:
-            // string
+          case STRING:
             rowData.add(stringRowData.get(columnId));
+            break;
         }
       }
       result.add(rowData);

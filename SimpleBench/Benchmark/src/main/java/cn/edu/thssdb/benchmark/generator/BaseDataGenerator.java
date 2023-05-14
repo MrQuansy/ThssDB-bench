@@ -1,7 +1,6 @@
 package cn.edu.thssdb.benchmark.generator;
 
 import cn.edu.thssdb.benchmark.common.TableSchema;
-import cn.edu.thssdb.common.Pair;
 
 import java.io.Serializable;
 import java.util.HashMap;

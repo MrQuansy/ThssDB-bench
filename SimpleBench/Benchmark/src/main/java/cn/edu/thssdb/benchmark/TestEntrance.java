@@ -1,11 +1,10 @@
 package cn.edu.thssdb.benchmark;
 
 import cn.edu.thssdb.benchmark.executor.CRUDTestExecutor;
-import org.apache.thrift.TException;
 
 public class TestEntrance {
 
-  public static void main(String args[]) throws TException {
+  public static void main(String args[]) {
 
     System.out.println("\n--- Start simple bench! ---");
 
@@ -27,6 +26,7 @@ public class TestEntrance {
       // delete and query data
       System.out.println("Delete and re-query data finished!");
     } catch (Exception e) {
+      e.printStackTrace();
       System.out.println("Failed to init cn.edu.thssdb.benchmark.executor.CRUDTestExecutor");
     }
 

@@ -18,4 +18,12 @@
  */
 package cn.edu.thssdb.benchmark.generator;
 
-public class ConcurrentDataGenerator {}
+public class ConcurrentDataGenerator extends BaseDataGenerator {
+  @Override
+  protected void initTableSchema() {}
+
+  @Override
+  public Object generateValue(String tableName, int rowId, int columnId) {
+    return null;
+  }
+}

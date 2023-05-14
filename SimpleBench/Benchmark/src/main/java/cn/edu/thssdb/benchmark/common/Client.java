@@ -33,7 +33,7 @@ public class Client {
   }
 
   public void close() {
-    DisconnetReq req = new DisconnetReq(sessionId);
+    DisconnectReq req = new DisconnectReq(sessionId);
     try {
       client.disconnect(req);
     } catch (TException e) {
