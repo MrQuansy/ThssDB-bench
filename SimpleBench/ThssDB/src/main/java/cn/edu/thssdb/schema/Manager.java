@@ -8,13 +8,11 @@ import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SimpleSQLVisitor;
 import cn.edu.thssdb.query.QueryResult;
-import cn.edu.thssdb.server.ThssDB;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -28,6 +26,7 @@ public class Manager {
   public HashMap<Long, ArrayList<String>> x_lock_list;
   public ArrayList<Long> waiting_session;
   public ArrayList<Long> transaction_session;
+
   public static Manager getInstance() {
     return ManagerHolder.INSTANCE;
   }
@@ -39,27 +38,27 @@ public class Manager {
     x_lock_list = new HashMap<>();
     waiting_session = new ArrayList<>();
     transaction_session = new ArrayList<>();
-    try{
+    try {
       recover();
-    }catch (Exception e){
+    } catch (Exception e) {
       System.out.println(e.getMessage());
     }
   }
 
-  public Database getCurrentDatabase(){
+  public Database getCurrentDatabase() {
     return current_database;
   }
 
   public void createDatabaseIfNotExists(String dbname) {
-    try{
+    try {
       lock.writeLock().lock();
-      if(!databases.containsKey(dbname)){
+      if (!databases.containsKey(dbname)) {
         databases.put(dbname, new Database(dbname));
         persist();
-      }else{
+      } else {
         throw new DuplicateDatabaseException(dbname);
       }
-      if(current_database == null){
+      if (current_database == null) {
         current_database = get(dbname);
       }
     } finally {
@@ -88,8 +87,7 @@ public class Manager {
       Database db = databases.get(dbname);
       db.dropSelf();
       // 正在使用
-      if(db == current_database)
-        current_database = null;
+      if (db == current_database) current_database = null;
       // 重写文件
       databases.remove(dbname);
       // 持久化
@@ -100,64 +98,65 @@ public class Manager {
   }
 
   public void switchDatabase(String dbname) {
-    try{
+    try {
       lock.readLock().lock();
-      if(!databases.containsKey(dbname)){
+      if (!databases.containsKey(dbname)) {
         throw new DatabaseNotExistException(dbname);
       }
       current_database = databases.get(dbname);
-    }finally {
+    } finally {
       lock.readLock().unlock();
     }
   }
 
-  public void persist(){
-    try{
+  public void persist() {
+    try {
       FileOutputStream file = new FileOutputStream(DATA_DIRECTORY + "meta_database.data");
       OutputStreamWriter wt = new OutputStreamWriter(file);
-      for(String dbName: databases.keySet()){
+      for (String dbName : databases.keySet()) {
         wt.write(dbName + "\n");
         databases.get(dbName).persist();
       }
       wt.close();
       file.close();
-    }catch (Exception e){
+    } catch (Exception e) {
       throw new FileException();
     }
   }
 
-  private void recover(){
+  private void recover() {
     File file = new File(DATA_DIRECTORY + "meta_database.data");
-    if(!file.isFile()){ return; }
-    try{
+    if (!file.isFile()) {
+      return;
+    }
+    try {
       InputStreamReader rd = new InputStreamReader(new FileInputStream(file));
       BufferedReader buff = new BufferedReader(rd);
       String line = null;
-      while((line = buff.readLine()) != null){
+      while ((line = buff.readLine()) != null) {
         createDatabaseIfNotExists(line);
         read_log(line);
       }
       buff.close();
       rd.close();
-    }catch(Exception e){
+    } catch (Exception e) {
       throw new FileException();
     }
   }
 
   private static class ManagerHolder {
     private static final Manager INSTANCE = new Manager();
-    private ManagerHolder() {
 
-    }
+    private ManagerHolder() {}
   }
 
-  public void put_x_lock(Table tb, Long sessionId){
-    if(transaction_session.contains(sessionId)){
-      while(true) {
+  public void put_x_lock(Table tb, Long sessionId) {
+    if (transaction_session.contains(sessionId)) {
+      while (true) {
         int lock_flag = -1;
-        if(!waiting_session.contains(sessionId)){
+        if (!waiting_session.contains(sessionId)) {
           lock_flag = tb.put_x_lock(sessionId);
-          switch (lock_flag){
+          switch (lock_flag) {
             case 1:
               x_lock_list.get(sessionId).add(tb.tableName);
               break;
@@ -166,92 +165,89 @@ public class Manager {
             default:
               waiting_session.add(sessionId);
           }
-        }else if(waiting_session.get(0) == sessionId){
+        } else if (waiting_session.get(0) == sessionId) {
           lock_flag = tb.put_x_lock(sessionId);
-          if(lock_flag == 1){
+          if (lock_flag == 1) {
             x_lock_list.get(sessionId).add(tb.tableName);
             waiting_session.remove(0);
-          }else if(lock_flag == 0){
+          } else if (lock_flag == 0) {
             waiting_session.remove(0);
           }
         }
-        if(lock_flag != -1)
-          break;
-        try{
+        if (lock_flag != -1) break;
+        try {
           Thread.sleep(400);
-        }catch (Exception e){
+        } catch (Exception e) {
           System.out.println(e);
         }
       }
     }
   }
 
-
-  public void put_s_lock(ArrayList<Table> tables, Long sessionId){
-    if(transaction_session.contains(sessionId)){
+  public void put_s_lock(ArrayList<Table> tables, Long sessionId) {
+    if (transaction_session.contains(sessionId)) {
       ArrayList<Table> tmp = new ArrayList<>();
-      while(true) {
+      while (true) {
         int lock_flag = -1;
-        if(!waiting_session.contains(sessionId)){
+        if (!waiting_session.contains(sessionId)) {
           tmp.clear();
-          for(Table tb : tables){
+          for (Table tb : tables) {
             lock_flag = tb.put_s_lock(sessionId);
-            if(lock_flag == -1){
-              for(Table tmp_tb : tmp){
+            if (lock_flag == -1) {
+              for (Table tmp_tb : tmp) {
                 tmp_tb.free_lock(sessionId, 1);
               }
               waiting_session.add(sessionId);
               tmp.clear();
               break;
-            }else if(lock_flag == 1){
+            } else if (lock_flag == 1) {
               tmp.add(tb);
             }
           }
-          if (tmp.size() > 0||lock_flag != -1)
-            break;
-        }else if(waiting_session.get(0) == sessionId){
+          if (tmp.size() > 0 || lock_flag != -1) break;
+        } else if (waiting_session.get(0) == sessionId) {
           tmp.clear();
-          for(Table tb : tables){
+          for (Table tb : tables) {
             lock_flag = tb.put_s_lock(sessionId);
-            if(lock_flag == -1){
-              for(Table tmp_tb : tmp){
+            if (lock_flag == -1) {
+              for (Table tmp_tb : tmp) {
                 tmp_tb.free_lock(sessionId, 1);
               }
               tmp.clear();
               break;
-            }else if(lock_flag == 1){
+            } else if (lock_flag == 1) {
               tmp.add(tb);
             }
           }
-          if (tmp.size() > 0 || lock_flag != -1){
+          if (tmp.size() > 0 || lock_flag != -1) {
             waiting_session.remove(0);
             break;
           }
         }
-        try{
+        try {
           Thread.sleep(400);
-        }catch (Exception e){
+        } catch (Exception e) {
           System.out.println(e);
         }
       }
-      if(tmp.size() > 0){
-        for(Table tb : tmp){
+      if (tmp.size() > 0) {
+        for (Table tb : tmp) {
           s_lock_list.get(sessionId).add(tb.tableName);
         }
       }
     }
   }
 
-  public ArrayList<QueryResult> handle(String s){
+  public ArrayList<QueryResult> handle(String s) {
     ArrayList<QueryResult> results = new ArrayList<>();
     ErrorListener errorListener = new ErrorListener();
-    try{
-      //词法分析
+    try {
+      // 词法分析
       SQLLexer lexer = new SQLLexer(CharStreams.fromString(s));
       lexer.removeErrorListeners();
-      lexer.addErrorListener(errorListener);       //添加错误提示
-      CommonTokenStream tokens = new CommonTokenStream(lexer);//转成token流
-      //句法分析
+      lexer.addErrorListener(errorListener); // 添加错误提示
+      CommonTokenStream tokens = new CommonTokenStream(lexer); // 转成token流
+      // 句法分析
       SQLParser parser = new SQLParser(tokens);
       parser.removeErrorListeners();
       parser.addErrorListener(errorListener);
@@ -260,7 +256,7 @@ public class Manager {
       results.addAll(simpleSQLVisitor.visitParse(parser.parse()));
       System.out.println("out");
       return results;
-    }catch (Exception e){
+    } catch (Exception e) {
       System.out.println("parser error");
       QueryResult queryResult = new QueryResult(e.getMessage(), false);
       results.add(queryResult);
@@ -268,64 +264,63 @@ public class Manager {
     }
   }
 
-  public void write_log(String statement){
+  public void write_log(String statement) {
     String path = DATA_DIRECTORY + current_database.get_name() + ".log";
-    try{
+    try {
       File file = new File(path);
-      if(!file.exists()){
+      if (!file.exists()) {
         file.createNewFile();
       }
       FileWriter writer = new FileWriter(path, true);
       writer.write(statement + "\n");
       writer.close();
 
-    }catch (IOException e){
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  public void read_log(String database_name){
-    String path = DATA_DIRECTORY+database_name+".log";
+  public void read_log(String database_name) {
+    String path = DATA_DIRECTORY + database_name + ".log";
     File file = new File(path);
-    if(file.exists() && file.isFile()){
+    if (file.exists() && file.isFile()) {
       handle("use " + database_name);
-      try{
+      try {
         FileInputStream inputStream = new FileInputStream(file);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String str = null;
         ArrayList<String> statements = new ArrayList<>();
         int last_trans = -1;
         int index = 0;
-        while((str = bufferedReader.readLine()) != null)
-        {
-          if(str.equals("begin transaction")){
+        while ((str = bufferedReader.readLine()) != null) {
+          if (str.equals("begin transaction")) {
             last_trans = index;
-          }else if(str.equals("commit")){
+          } else if (str.equals("commit")) {
             last_trans = -1;
           }
           statements.add(str);
           ++index;
           System.out.println(str);
         }
-        if(last_trans == -1){
+        if (last_trans == -1) {
           last_trans = statements.size();
         }
-        for(int i = 0; i < last_trans; ++i){
+        for (int i = 0; i < last_trans; ++i) {
           handle(statements.get(i));
         }
         inputStream.close();
         bufferedReader.close();
-        if(last_trans != -1){
+        if (last_trans != -1) {
           FileWriter writer = new FileWriter(path);
           writer.write("");
           writer.close();
           writer = new FileWriter(path, true);
-          for(int i = 0; i < last_trans; ++i){
+          for (int i = 0; i < last_trans; ++i) {
             writer.write(statements.get(i) + "\n");
           }
           writer.close();
         }
-      }catch (IOException e){
+      } catch (IOException e) {
         e.printStackTrace();
       }
     }

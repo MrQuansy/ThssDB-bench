@@ -2,30 +2,26 @@ import org.apache.thrift.TException;
 
 public class TestEntrance {
 
-    private static int successStatusCode = 0;
-
     public static void main(String args[]) throws TException {
-
-        Client client = new Client("127.0.0.1",6667);
 
         System.out.println("\n--- Start simple bench! ---");
 
-        TestExecutor testExecutor = new TestExecutor();
+        CRUDTestExecutor CRUDTestExecutor = new CRUDTestExecutor();
 
         //create database
-        testExecutor.createAndUseDB(client);
+        CRUDTestExecutor.createAndUseDB();
         System.out.println("Create database finished!");
 
         // create table
-        testExecutor.createTable(client);
+        CRUDTestExecutor.createTable();
         System.out.println("Create table finished!");
 
         //insert data:
-        testExecutor.insertData(client);
+        CRUDTestExecutor.insertData();
         System.out.println("Insert data finished!");
 
         //query data:
-        testExecutor.queryData(client);
+        CRUDTestExecutor.queryData();
         System.out.println("Query data finished!");
         //update and query data
 

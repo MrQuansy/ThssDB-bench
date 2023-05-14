@@ -24,26 +24,27 @@ public class Row implements Serializable {
   public ArrayList<Entry> getEntries() {
     return entries;
   }
-  public Entry getEntry(int position) { return entries.get(position); }
+
+  public Entry getEntry(int position) {
+    return entries.get(position);
+  }
 
   public void appendEntries(ArrayList<Entry> entries) {
     this.entries.addAll(entries);
   }
 
-  public ArrayList<String> getDataList(){
+  public ArrayList<String> getDataList() {
     ArrayList<String> rowData = new ArrayList<>();
-    for (Entry e : entries){
+    for (Entry e : entries) {
       rowData.add(e.toString());
     }
     return rowData;
   }
 
   public String toString() {
-    if (entries == null)
-      return "EMPTY";
+    if (entries == null) return "EMPTY";
     StringJoiner sj = new StringJoiner(", ");
-    for (Entry e : entries)
-      sj.add(e.toString());
+    for (Entry e : entries) sj.add(e.toString());
     return sj.toString();
   }
 }

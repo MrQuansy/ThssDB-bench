@@ -5,7 +5,6 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.service.IServiceHandler;
 import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
@@ -43,7 +42,7 @@ public class ThssDB {
     try {
       transport = new TServerSocket(Global.DEFAULT_SERVER_PORT);
       server = new TThreadPoolServer(new TThreadPoolServer.Args(transport).processor(processor));
-      //server = new TSimpleServer(new TServer.Args(transport).processor(processor));
+      // server = new TSimpleServer(new TServer.Args(transport).processor(processor));
       logger.info("Starting ThssDB ...");
       server.serve();
     } catch (TTransportException e) {
@@ -53,8 +52,7 @@ public class ThssDB {
 
   private static class ThssDBHolder {
     private static final ThssDB INSTANCE = new ThssDB();
-    private ThssDBHolder() {
 
-    }
+    private ThssDBHolder() {}
   }
 }

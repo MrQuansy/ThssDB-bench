@@ -1,11 +1,9 @@
 import cn.edu.thssdb.rpc.thrift.*;
-import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
-import org.apache.thrift.transport.TTransportException;
 
 public class Client{
     private IService.Client client;
@@ -29,6 +27,16 @@ public class Client{
 
     public ExecuteStatementResp executeStatement(String sql) throws TException {
         return client.executeStatement(new ExecuteStatementReq(sessionId,sql));
+    }
+
+    public void close(){
+        DisconnetReq req = new DisconnetReq(sessionId);
+        try {
+            client.disconnect(req);
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+        transport.close();
     }
 
 

@@ -71,8 +71,7 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
         BPlusTreeNode<K, V> newSiblingNode = left.split();
         insertChild(newSiblingNode.getFirstLeafKey(), newSiblingNode);
       }
-    } else if (index >= 0)
-      keys.set(index, children.get(index + 1).getFirstLeafKey());
+    } else if (index >= 0) keys.set(index, children.get(index + 1).getFirstLeafKey());
   }
 
   @Override
@@ -135,16 +134,14 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
   private BPlusTreeNode<K, V> getChildLeftSibling(K key) {
     int index = binarySearch(key);
     int childIndex = index >= 0 ? index + 1 : -index - 1;
-    if (childIndex > 0)
-      return children.get(childIndex - 1);
+    if (childIndex > 0) return children.get(childIndex - 1);
     return null;
   }
 
   private BPlusTreeNode<K, V> getChildRightSibling(K key) {
     int index = binarySearch(key);
     int childIndex = index >= 0 ? index + 1 : -index - 1;
-    if (childIndex < size())
-      return children.get(childIndex + 1);
+    if (childIndex < size()) return children.get(childIndex + 1);
     return null;
   }
 }

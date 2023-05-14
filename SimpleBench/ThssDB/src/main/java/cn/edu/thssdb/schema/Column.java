@@ -26,16 +26,35 @@ public class Column implements Comparable<Column> {
     this.notNull = notNull;
   }
 
-  /**--- GET methods ---*/
-  public String getName() { return this.name; }
-  public ColumnType getType() { return this.type; }
-  public int isPrimary() { return this.primary; }
-  public boolean isNotNull() { return this.notNull; }
-  public int getMaxLength() { return this.maxLength; }
+  /** --- GET methods --- */
+  public String getName() {
+    return this.name;
+  }
 
-  /**--- SET methods ---*/
-  public void setPrimary(int new_primary) { this.primary=new_primary; }
-  public void setNotNull(boolean new_notNull) { this.notNull=new_notNull; }
+  public ColumnType getType() {
+    return this.type;
+  }
+
+  public int isPrimary() {
+    return this.primary;
+  }
+
+  public boolean isNotNull() {
+    return this.notNull;
+  }
+
+  public int getMaxLength() {
+    return this.maxLength;
+  }
+
+  /** --- SET methods --- */
+  public void setPrimary(int new_primary) {
+    this.primary = new_primary;
+  }
+
+  public void setNotNull(boolean new_notNull) {
+    this.notNull = new_notNull;
+  }
 
   @Override
   public int compareTo(Column e) {
@@ -47,23 +66,26 @@ public class Column implements Comparable<Column> {
   }
 
   @Override
-  public int hashCode(){
-    return Objects.hash(name) + Objects.hash(type) + Objects.hash(primary)
-            +Objects.hash(notNull) + Objects.hash(maxLength);
+  public int hashCode() {
+    return Objects.hash(name)
+        + Objects.hash(type)
+        + Objects.hash(primary)
+        + Objects.hash(notNull)
+        + Objects.hash(maxLength);
   }
 
   @Override
-  public boolean equals(Object obj){
-    if(this == obj)
-      return true;
-    if(obj == null)
-      return false;
-    if(!(obj instanceof Column)){
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (!(obj instanceof Column)) {
       return false;
     }
     Column col = (Column) obj;
-    return Objects.equals(name, col.name) && Objects.equals(type, col.type) &&
-            Objects.equals(primary, col.primary) && Objects.equals( notNull, col.notNull)
-            && Objects.equals( maxLength,col.maxLength);
+    return Objects.equals(name, col.name)
+        && Objects.equals(type, col.type)
+        && Objects.equals(primary, col.primary)
+        && Objects.equals(notNull, col.notNull)
+        && Objects.equals(maxLength, col.maxLength);
   }
 }

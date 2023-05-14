@@ -17,16 +17,14 @@ public class Entry implements Comparable<Entry>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (this.getClass() != obj.getClass())
-      return false;
+    if (obj == null) return false;
+    if (this.getClass() != obj.getClass()) return false;
     Entry e = (Entry) obj;
     return value.equals(e.value);
   }
 
   public String toString() {
-    if(this.value==null) return "null";
+    if (this.value == null) return "null";
     return value.toString();
   }
 

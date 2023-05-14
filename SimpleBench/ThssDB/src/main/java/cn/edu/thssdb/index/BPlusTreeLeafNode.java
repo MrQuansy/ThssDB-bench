@@ -19,14 +19,12 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   }
 
   private void valuesAdd(int index, V value) {
-    for (int i = nodeSize; i > index; i--)
-      values.set(i, values.get(i - 1));
+    for (int i = nodeSize; i > index; i--) values.set(i, values.get(i - 1));
     values.set(index, value);
   }
 
   private void valuesRemove(int index) {
-    for (int i = index; i < nodeSize - 1; i++)
-      values.set(i, values.get(i + 1));
+    for (int i = index; i < nodeSize - 1; i++) values.set(i, values.get(i + 1));
   }
 
   @Override
@@ -37,8 +35,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   @Override
   V get(K key) {
     int index = binarySearch(key);
-    if (index >= 0)
-      return values.get(index);
+    if (index >= 0) return values.get(index);
     throw new KeyNotExistException();
   }
 
@@ -46,8 +43,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   void put(K key, V value) {
     int index = binarySearch(key);
     int valueIndex = index >= 0 ? index : -index - 1;
-    if (index >= 0)
-      throw new DuplicateKeyException();
+    if (index >= 0) throw new DuplicateKeyException();
     else {
       valuesAdd(valueIndex, value);
       keysAdd(valueIndex, key);
@@ -60,8 +56,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
     if (index >= 0) {
       valuesRemove(index);
       keysRemove(index);
-    } else
-      throw new KeyNotExistException();
+    } else throw new KeyNotExistException();
   }
 
   @Override

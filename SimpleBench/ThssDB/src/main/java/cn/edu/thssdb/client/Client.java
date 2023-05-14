@@ -133,9 +133,9 @@ public class Client {
     if(sessionId == -1){
       println("Haven't connected!");
     }else{
-      DisconnetReq req = new DisconnetReq(sessionId);
+      DisconnectReq req = new DisconnectReq(sessionId);
       try {
-        DisconnetResp resp = client.disconnect(req);
+        DisconnectResp resp = client.disconnect(req);
         if(resp.getStatus().getCode() == Global.FAILURE_CODE ){
           println(resp.getStatus().getMsg());
         }else {
@@ -161,10 +161,8 @@ public class Client {
         if(resp.getStatus().getCode() == Global.FAILURE_CODE){
           println(resp.getStatus().getMsg());
         }else {
-          boolean isAbort = resp.isIsAbort();
           boolean hasResult = resp.isHasResult();
 //           对于查询语句：
-          if(! isAbort){
             if(hasResult){
               List<String> columnsList = resp.getColumnsList();
               println(columnsList.toString());
@@ -175,9 +173,6 @@ public class Client {
             }else {
               println(resp.getStatus().getMsg());
             }
-          }else {
-            println(resp.getStatus().getMsg());
-          }
         }
       }catch (TException e){
         logger.error(e.getMessage());

@@ -1,3 +1,5 @@
+import cn.edu.thssdb.common.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +64,7 @@ public abstract class BaseDataGenerator {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            cn.edu.thssdb.utils.Pair<?, ?> other = (cn.edu.thssdb.utils.Pair<?, ?>) obj;
+            Pair<?, ?> other = (Pair<?, ?>) obj;
             if (left == null) {
                 if (other.left != null) {
                     return false;

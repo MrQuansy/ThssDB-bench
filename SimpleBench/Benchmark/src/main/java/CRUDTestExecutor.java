@@ -1,8 +1,6 @@
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
-import cn.edu.thssdb.schema.Table;
 import org.apache.thrift.TException;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class TestExecutor {
+public class CRUDTestExecutor implements ITestExecutor{
 
     private BaseDataGenerator dataGenerator;
     private Map<String, TableSchema> schemaMap;
@@ -19,13 +17,16 @@ public class TestExecutor {
     private static int successStatusCode = 0;
     public int points = 100;
 
-    public TestExecutor(){
+    private Client client;
+
+    public CRUDTestExecutor() throws TException {
         dataGenerator = new SimpleDataGenerator();
         schemaMap = dataGenerator.getSchemaMap();
         dataMap = new HashMap<>();
+        client = new Client("127.0.0.1",6667);
     }
 
-    public void createAndUseDB(Client client) throws TException {
+    public void createAndUseDB() throws TException {
         ExecuteStatementResp resp = client.executeStatement("create database db1;");
         if (resp.status.code==successStatusCode){
             System.out.println("Create database db1 finished");
@@ -50,7 +51,7 @@ public class TestExecutor {
       column10 string
         );
      */
-    public void createTable(Client client) throws TException {
+    public void createTable() throws TException {
         for(TableSchema tableSchema:schemaMap.values()) {
             StringBuilder sb = new StringBuilder("CREATE TABLE " + tableSchema.tableName + " (");
             for (int columnId = 0; columnId < tableSchema.columns.size(); columnId++) {
@@ -66,7 +67,7 @@ public class TestExecutor {
         }
     }
 
-    public void insertData(Client client) throws TException {
+    public void insertData() throws TException {
         for(Map.Entry<String,TableSchema> tableSchemaEntry : schemaMap.entrySet()) {
             String tableName = tableSchemaEntry.getKey();
             Set<List<Object>> tableData = new HashSet<>();
@@ -92,7 +93,7 @@ public class TestExecutor {
         }
     }
 
-    public void queryData(Client client) throws TException {
+    public void queryData() throws TException {
         //test 1: query all rows
         String querySql = "select * from test_table1;";
         ExecuteStatementResp resp = client.executeStatement(querySql);
@@ -157,7 +158,7 @@ public class TestExecutor {
 //        resp = client.executeStatement(querySql);
     }
 
-    public void updateAndQueryData(Client client) throws TException {
+    public void updateAndQueryData() throws TException {
         //1. 更新整列值
         String updateSql = "update test_table1 set column5 = 100;";
         client.executeStatement(updateSql);
@@ -223,7 +224,7 @@ public class TestExecutor {
         }
     }
 
-    public static void deleteAndQueryData(Client client){
+    public static void deleteAndQueryData(){
         //delete where column1=100
         String deleteSql = "delete from test_table4 where column1 = 100;";
 //        //drop table
@@ -301,5 +302,12 @@ public class TestExecutor {
         }
 
         return true;
+    }
+
+    @Override
+    public void close() throws Exception {
+        if(client!=null){
+            client.close();
+        }
     }
 }
