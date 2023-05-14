@@ -1,0 +1,72 @@
+**/*.pid
+**/gc.log*
+**/logs/*
+**/lib/**
+**/data/**
+
+# Eclipse IDE files
+**/.classpath
+**/.project
+**/.settings/
+
+# src/main/resources/
+# intellij IDE files
+**/*.iml
+**/.idea/
+**/*.log
+**/*.ipr
+**/*.iws
+
+# Apple OS X related
+**/.DS_Store
+derby-tsfile-db
+
+# build generated
+**/target/
+
+# build docker images
+tmp
+
+*.txt
+
+*.jar
+
+*.gz
+*.tar.gz
+*.tar
+*.tokens
+#src/test/resources/logback.xml
+
+### CSV ###
+*.csv
+*.log
+
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### vscode project
+**/.vscode/
+**/lib/
+/target/
+
+### Apache release ###
+local-snapshots-dir/
+venv/
+
+partitions.tmp
+partitions
+
+### temporary file of the distributed version ###
+remote/
+!integration-test/src/main/java/org/apache/iotdb/it/env/remote/
+
+# gitpod
+.theia/
+
+classes/
