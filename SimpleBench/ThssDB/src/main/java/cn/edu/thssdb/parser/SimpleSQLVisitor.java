@@ -359,6 +359,7 @@ public class SimpleSQLVisitor extends SQLBaseVisitor {
       //            System.out.println("Insert OK.");
       return new QueryResult("Insert OK.", true);
     } catch (Exception e) {
+      e.printStackTrace();
       System.out.println(e.getMessage());
       return new QueryResult(e.getMessage(), false);
     }

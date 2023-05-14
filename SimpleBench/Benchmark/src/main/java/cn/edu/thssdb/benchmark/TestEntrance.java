@@ -1,6 +1,7 @@
 package cn.edu.thssdb.benchmark;
 
 import cn.edu.thssdb.benchmark.executor.CRUDTestExecutor;
+import cn.edu.thssdb.benchmark.executor.ConcurrentTestExecutor;
 
 public class TestEntrance {
 
@@ -25,6 +26,15 @@ public class TestEntrance {
       System.out.println("Update and re-query data finished!");
       // delete and query data
       System.out.println("Delete and re-query data finished!");
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Failed to init cn.edu.thssdb.benchmark.executor.CRUDTestExecutor");
+    }
+
+    try (ConcurrentTestExecutor concurrentTestExecutor = new ConcurrentTestExecutor()) {
+      concurrentTestExecutor.createAndUseDB();
+      concurrentTestExecutor.concurrentCreateTable();
+      concurrentTestExecutor.concurrentInsertAndQuery();
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("Failed to init cn.edu.thssdb.benchmark.executor.CRUDTestExecutor");

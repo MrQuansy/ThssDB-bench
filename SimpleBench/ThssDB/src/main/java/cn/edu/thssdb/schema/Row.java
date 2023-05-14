@@ -36,7 +36,7 @@ public class Row implements Serializable {
   public ArrayList<String> getDataList() {
     ArrayList<String> rowData = new ArrayList<>();
     for (Entry e : entries) {
-      rowData.add(e.toString());
+      rowData.add(e == null ? "null" : e.toString());
     }
     return rowData;
   }
@@ -44,7 +44,7 @@ public class Row implements Serializable {
   public String toString() {
     if (entries == null) return "EMPTY";
     StringJoiner sj = new StringJoiner(", ");
-    for (Entry e : entries) sj.add(e.toString());
+    for (Entry e : entries) sj.add(e == null ? "" : e.toString());
     return sj.toString();
   }
 }

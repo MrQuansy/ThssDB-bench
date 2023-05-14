@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class CRUDTestExecutor implements ITestExecutor {
+public class CRUDTestExecutor extends TestExecutor {
 
   private BaseDataGenerator dataGenerator;
   private Map<String, TableSchema> schemaMap;
@@ -61,18 +61,7 @@ public class CRUDTestExecutor implements ITestExecutor {
   */
   public void createTable() throws TException {
     for (TableSchema tableSchema : schemaMap.values()) {
-      StringBuilder sb = new StringBuilder("CREATE TABLE " + tableSchema.tableName + " (");
-      for (int columnId = 0; columnId < tableSchema.columns.size(); columnId++) {
-        sb.append(
-            tableSchema.columns.get(columnId) + " " + tableSchema.types.get(columnId).getType());
-        sb.append(",");
-      }
-      sb.append("primary key(" + tableSchema.columns.get(tableSchema.primaryKeyColumnIndex) + ")");
-      sb.append(");");
-      ExecuteStatementResp resp = client.executeStatement(sb.toString());
-      if (resp.status.code == 0) {
-        System.out.println("create table " + tableSchema.tableName + " finished!");
-      }
+      createTable(tableSchema, client);
     }
   }
 
@@ -317,7 +306,7 @@ public class CRUDTestExecutor implements ITestExecutor {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     if (client != null) {
       client.close();
     }

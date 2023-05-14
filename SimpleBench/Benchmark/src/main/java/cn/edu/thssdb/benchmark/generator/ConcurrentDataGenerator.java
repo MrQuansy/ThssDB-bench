@@ -18,12 +18,49 @@
  */
 package cn.edu.thssdb.benchmark.generator;
 
+import cn.edu.thssdb.benchmark.common.Constants;
+import cn.edu.thssdb.benchmark.common.DataType;
+import cn.edu.thssdb.benchmark.common.TableSchema;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ConcurrentDataGenerator extends BaseDataGenerator {
+
+  private String stringFormat = "%0" + Constants.stringLength + "d";
+
   @Override
-  protected void initTableSchema() {}
+  protected void initTableSchema() {
+    List<String> columns = new ArrayList<>();
+    List<DataType> types = new ArrayList<>();
+    List<Boolean> notNull = new ArrayList<>();
+    for (int columnId = 0; columnId < Constants.columnTypes.length; columnId++) {
+      columns.add("column" + columnId);
+      types.add(Constants.columnTypes[columnId % Constants.columnTypes.length]);
+      notNull.add(columnId == 0);
+    }
+    schemaMap.put(
+        "concurrent_table_1", new TableSchema("concurrent_table_1", columns, types, notNull, 0));
+    schemaMap.put(
+        "concurrent_table_2", new TableSchema("concurrent_table_2", columns, types, notNull, 0));
+  }
 
   @Override
   public Object generateValue(String tableName, int rowId, int columnId) {
+    if (columnId == 0 || columnId == rowId % 5) {
+      switch (schemaMap.get(tableName).types.get(columnId)) {
+        case INT:
+          return rowId;
+        case LONG:
+          return (long) rowId;
+        case DOUBLE:
+          return (double) rowId;
+        case FLOAT:
+          return (float) rowId;
+        case STRING:
+          return String.format(stringFormat, rowId);
+      }
+    }
     return null;
   }
 }

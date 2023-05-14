@@ -17,11 +17,14 @@ public class SimpleDataGenerator extends BaseDataGenerator {
       String tableName = "test_table" + tableId;
       List<String> columns = new ArrayList<>();
       List<DataType> types = new ArrayList<>();
+      List<Boolean> notNull = new ArrayList<>();
       for (int columnId = 0; columnId < Constants.columnCount; columnId++) {
         columns.add("column" + columnId);
         types.add(Constants.columnTypes[columnId % Constants.columnTypes.length]);
+        // TODO: primary key column should be not null
+        notNull.add(false);
       }
-      schemaMap.put(tableName, new TableSchema(tableName, columns, types, tableId));
+      schemaMap.put(tableName, new TableSchema(tableName, columns, types, notNull, tableId));
     }
   }
 
