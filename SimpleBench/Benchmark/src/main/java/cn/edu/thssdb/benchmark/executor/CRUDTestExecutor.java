@@ -23,8 +23,6 @@ public class CRUDTestExecutor extends TestExecutor {
   private Map<String, TableSchema> schemaMap;
   private Map<String, Set<List<Object>>> dataMap; // index by primary key
   private static int successStatusCode = 0;
-  public int points = 100;
-
   private Client client;
 
   public CRUDTestExecutor() throws TException {
