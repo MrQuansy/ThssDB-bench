@@ -39,7 +39,9 @@ public class CRUDTest {
     CRUDTestExecutor.queryData();
     // update and query data
     LOGGER.info("======================== Update and re-query data ========================");
+    CRUDTestExecutor.updateAndQueryData();
     // delete and query data
     LOGGER.info("======================== Delete and re-query data ========================");
+    CRUDTestExecutor.deleteAndQueryData();
   }
 }

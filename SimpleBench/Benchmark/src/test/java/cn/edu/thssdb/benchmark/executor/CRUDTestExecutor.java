@@ -180,7 +180,7 @@ public class CRUDTestExecutor extends TestExecutor {
 
     tableData = dataMap.get("test_table2");
     for (List<Object> rowData : tableData) {
-      if ((double) rowData.get(2) == 50) {
+      if ((float) rowData.get(2) == 50) {
         rowData.set(2, 100);
       }
     }
@@ -200,7 +200,7 @@ public class CRUDTestExecutor extends TestExecutor {
 
     tableData = dataMap.get("test_table3");
     for (List<Object> rowData : tableData) {
-      if ((double) rowData.get(2) == 50) {
+      if ((float) rowData.get(2) == 50) {
         rowData.set(3, 100);
       }
     }
@@ -215,11 +215,22 @@ public class CRUDTestExecutor extends TestExecutor {
     Assert.assertTrue(equals(queryResult, tableData));
   }
 
-  public static void deleteAndQueryData() {
+  public void deleteAndQueryData() throws TException {
     // delete where column1=100
-    String deleteSql = "delete from test_table4 where column1 = 100;";
-    //        //drop table
-    //        String dropSql = "drop "
+    String deleteSql = "delete from test_table4 where column0 = 5;";
+    client.executeStatement(deleteSql);
+
+    Set<List<Object>> tableData = dataMap.get("test_table4");
+
+    tableData.removeIf(rowData -> (int) rowData.get(0) == 5);
+
+    // test
+    String querySql = "select * from test_table4;";
+    ExecuteStatementResp resp = client.executeStatement(querySql);
+    TableSchema tableSchema = dataGenerator.getTableSchema("test_table4");
+    Set<List<Object>> queryResult = convertData(resp.rowList, tableSchema.types);
+    tableData = dataMap.get("test_table4");
+    Assert.assertTrue(equals(queryResult, tableData));
   }
 
   private boolean check(String type, Object expectValue, String actualValue) {
