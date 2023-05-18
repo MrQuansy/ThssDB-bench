@@ -40,10 +40,10 @@ public class CRUDTestExecutor extends TestExecutor {
     client.executeStatement("drop database db1;");
     // make sure database not exist, it's ok to ignore the error
     ExecuteStatementResp resp = client.executeStatement("create database db1;");
-    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
     LOGGER.info("Create database db1 finished");
     resp = client.executeStatement("use db1;");
-    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
     LOGGER.info("Use db1 finished");
   }
 

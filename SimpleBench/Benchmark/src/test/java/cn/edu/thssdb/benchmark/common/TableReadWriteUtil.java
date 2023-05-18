@@ -66,7 +66,7 @@ public class TableReadWriteUtil {
     String querySql = "select * from " + tableSchema.tableName + ";";
     ExecuteStatementResp resp = client.executeStatement(querySql);
     LOGGER.info(querySql);
-    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
     // check row size
     Assert.assertEquals(rowNum, resp.rowList.size());
     // check column

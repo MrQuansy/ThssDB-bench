@@ -9,7 +9,7 @@ public class Constants {
   public static final int tableCount = 10;
   // 字符串长度
   public static final int stringLength = 5;
-  public static final int successStatusCode = Global.SUCCESS_CODE;
+  public static final int SUCCESS_STATUS_CODE = Global.SUCCESS_CODE;
   // 列类型
   public static final DataType[] columnTypes = {
     DataType.INT, DataType.LONG, DataType.FLOAT, DataType.DOUBLE, DataType.STRING

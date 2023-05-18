@@ -73,12 +73,12 @@ public class PerformanceTestExecutor extends TestExecutor {
     schemaClient.executeStatement("drop database db_performance;");
     // make sure database not exist, it's ok to ignore the error
     ExecuteStatementResp resp1 = schemaClient.executeStatement("create database db_performance;");
-    Assert.assertEquals(Constants.successStatusCode, resp1.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp1.status.code);
     LOGGER.info("Create database db_concurrent finished");
     for (int i = 0; i < CONCURRENT_NUMBER; i++) {
       Client client = clients.get(i);
       ExecuteStatementResp resp2 = client.executeStatement("use db_performance;");
-      Assert.assertEquals(Constants.successStatusCode, resp2.status.code);
+      Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp2.status.code);
       LOGGER.info("Client-" + i + " use db_performance finished");
       createTable(schemaMap.get("test_table" + i), client);
     }
@@ -156,7 +156,7 @@ public class PerformanceTestExecutor extends TestExecutor {
       long startTime = System.nanoTime();
       ExecuteStatementResp resp = client.executeStatement(sql);
       long finishTime = System.nanoTime();
-      Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+      Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
       measurement.record(
           Operation.WRITE, WRITE_ROW_NUMBER * tableSchema.columns.size(), finishTime - startTime);
     }
@@ -168,7 +168,7 @@ public class PerformanceTestExecutor extends TestExecutor {
     long startTime = System.nanoTime();
     ExecuteStatementResp resp = client.executeStatement(querySql);
     long finishTime = System.nanoTime();
-    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
     measurement.record(
         Operation.QUERY, resp.rowList.size() * tableSchema.columns.size(), finishTime - startTime);
   }

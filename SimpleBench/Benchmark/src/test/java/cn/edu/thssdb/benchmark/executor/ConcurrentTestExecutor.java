@@ -54,12 +54,12 @@ public class ConcurrentTestExecutor extends TestExecutor {
     client1.executeStatement("drop database db_concurrent;");
     // make sure database not exist, it's ok to ignore the error
     ExecuteStatementResp resp = client1.executeStatement("create database db_concurrent;");
-    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
     LOGGER.info("Create database db_concurrent finished");
     ExecuteStatementResp resp1 = client1.executeStatement("use db_concurrent;");
-    Assert.assertEquals(Constants.successStatusCode, resp1.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp1.status.code);
     ExecuteStatementResp resp2 = client2.executeStatement("use db_concurrent;");
-    Assert.assertEquals(Constants.successStatusCode, resp2.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp2.status.code);
     LOGGER.info("Use db_concurrent finished");
   }
 

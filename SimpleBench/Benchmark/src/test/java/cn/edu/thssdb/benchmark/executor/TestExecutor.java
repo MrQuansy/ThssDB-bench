@@ -32,7 +32,7 @@ public abstract class TestExecutor {
     sb.append(");");
     LOGGER.info(sb.toString());
     ExecuteStatementResp resp = client.executeStatement(sb.toString());
-    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
     LOGGER.info("create table " + tableSchema.tableName + " finished!");
   }
 }
