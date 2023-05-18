@@ -1,11 +1,17 @@
 package cn.edu.thssdb.benchmark.executor;
 
 import cn.edu.thssdb.benchmark.common.Client;
+import cn.edu.thssdb.benchmark.common.Constants;
 import cn.edu.thssdb.benchmark.common.TableSchema;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import org.apache.thrift.TException;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class TestExecutor implements AutoCloseable {
+public abstract class TestExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(CRUDTestExecutor.class);
 
   public abstract void close();
 
@@ -24,10 +30,9 @@ public abstract class TestExecutor implements AutoCloseable {
         .append(tableSchema.columns.get(tableSchema.primaryKeyColumnIndex))
         .append(")");
     sb.append(");");
-    System.out.println(sb);
+    LOGGER.info(sb.toString());
     ExecuteStatementResp resp = client.executeStatement(sb.toString());
-    if (resp.status.code == 0) {
-      System.out.println("create table " + tableSchema.tableName + " finished!");
-    }
+    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    LOGGER.info("create table " + tableSchema.tableName + " finished!");
   }
 }

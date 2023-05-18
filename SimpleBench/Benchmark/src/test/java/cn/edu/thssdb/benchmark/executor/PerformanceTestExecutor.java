@@ -28,12 +28,16 @@ import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import com.clearspring.analytics.stream.quantile.TDigest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class PerformanceTestExecutor extends TestExecutor {
-  private static final int SUCCESS_CODE = 0;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceTestExecutor.class);
   private static final int CONCURRENT_NUMBER = Constants.tableCount;
   private static final int WRITE_ROW_NUMBER = 10;
   private static final int COMPRESSION = 3000;
@@ -66,16 +70,16 @@ public class PerformanceTestExecutor extends TestExecutor {
   public void test() throws TException {
     // create database and use database
     Client schemaClient = clients.get(0);
+    schemaClient.executeStatement("drop database db_performance;");
+    // make sure database not exist, it's ok to ignore the error
     ExecuteStatementResp resp1 = schemaClient.executeStatement("create database db_performance;");
-    if (resp1.status.code == SUCCESS_CODE) {
-      System.out.println("Create database db_concurrent finished");
-    }
+    Assert.assertEquals(Constants.successStatusCode, resp1.status.code);
+    LOGGER.info("Create database db_concurrent finished");
     for (int i = 0; i < CONCURRENT_NUMBER; i++) {
       Client client = clients.get(i);
       ExecuteStatementResp resp2 = client.executeStatement("use db_performance;");
-      if (resp2.status.code == SUCCESS_CODE) {
-        System.out.println("Client-" + i + " use db_performance finished");
-      }
+      Assert.assertEquals(Constants.successStatusCode, resp2.status.code);
+      LOGGER.info("Client-" + i + " use db_performance finished");
       createTable(schemaMap.get("test_table" + i), client);
     }
     // performance test
@@ -86,7 +90,7 @@ public class PerformanceTestExecutor extends TestExecutor {
           CompletableFuture.runAsync(
               () -> {
                 try {
-                  System.out.println("Start Performance Test for Client-" + index);
+                  LOGGER.info("Start Performance Test for Client-" + index);
                   Client client = clients.get(index);
                   Measurement measurement = measurements.get(index);
                   TableSchema tableSchema = schemaMap.get("test_table" + index);
@@ -98,7 +102,7 @@ public class PerformanceTestExecutor extends TestExecutor {
                       doQueryOperation(measurement, tableSchema, client);
                     }
                   }
-                  System.out.println("Finish Performance Test for Client-" + index);
+                  LOGGER.info("Finish Performance Test for Client-" + index);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
@@ -114,16 +118,15 @@ public class PerformanceTestExecutor extends TestExecutor {
       long totalNumber = 0;
       long totalPoint = 0;
       for (Double quantile : quantiles) {
-        System.out.println(
-            operation + "-" + quantile + ": " + (digest.quantile(quantile) / 1e6) + " ms");
+        LOGGER.info(operation + "-" + quantile + ": " + (digest.quantile(quantile) / 1e6) + " ms");
       }
       for (Measurement measurement : measurements.values()) {
         totalLatency += measurement.getOperationLatencySumThisClient().get(operation);
         totalPoint += measurement.getOkPointNumMap().get(operation);
         totalNumber += measurement.getOkOperationNumMap().get(operation);
       }
-      System.out.println(operation + " per second: " + (totalNumber / (totalLatency / 1e9)));
-      System.out.println(operation + " points per second: " + (totalPoint / (totalLatency / 1e9)));
+      LOGGER.info(operation + " per second: " + (totalNumber / (totalLatency / 1e9)));
+      LOGGER.info(operation + " points per second: " + (totalPoint / (totalLatency / 1e9)));
     }
   }
 
@@ -153,12 +156,9 @@ public class PerformanceTestExecutor extends TestExecutor {
       long startTime = System.nanoTime();
       ExecuteStatementResp resp = client.executeStatement(sql);
       long finishTime = System.nanoTime();
-      if (resp.status.code == SUCCESS_CODE) {
-        measurement.record(
-            Operation.WRITE, WRITE_ROW_NUMBER * tableSchema.columns.size(), finishTime - startTime);
-      } else {
-        System.out.println("Insert into " + tableName + " failed");
-      }
+      Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+      measurement.record(
+          Operation.WRITE, WRITE_ROW_NUMBER * tableSchema.columns.size(), finishTime - startTime);
     }
   }
 
@@ -168,18 +168,18 @@ public class PerformanceTestExecutor extends TestExecutor {
     long startTime = System.nanoTime();
     ExecuteStatementResp resp = client.executeStatement(querySql);
     long finishTime = System.nanoTime();
-    if (resp.status.code == SUCCESS_CODE) {
-      measurement.record(
-          Operation.QUERY,
-          resp.rowList.size() * tableSchema.columns.size(),
-          finishTime - startTime);
-    } else {
-      System.out.println("query " + tableSchema.tableName + " failed");
-    }
+    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    measurement.record(
+        Operation.QUERY, resp.rowList.size() * tableSchema.columns.size(), finishTime - startTime);
   }
 
   @Override
   public void close() {
+    try {
+      clients.get(0).executeStatement("drop database db_performance");
+    } catch (TException e) {
+      LOGGER.error("{}", e.getMessage(), e);
+    }
     if (clients != null) {
       for (Client client : clients) {
         client.close();

@@ -8,6 +8,9 @@ import cn.edu.thssdb.benchmark.generator.BaseDataGenerator;
 import cn.edu.thssdb.benchmark.generator.SimpleDataGenerator;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import org.apache.thrift.TException;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,10 +22,11 @@ import java.util.Set;
 
 public class CRUDTestExecutor extends TestExecutor {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CRUDTestExecutor.class);
+
   private BaseDataGenerator dataGenerator;
   private Map<String, TableSchema> schemaMap;
   private Map<String, Set<List<Object>>> dataMap; // index by primary key
-  private static int successStatusCode = 0;
   private Client client;
 
   public CRUDTestExecutor() throws TException {
@@ -33,14 +37,14 @@ public class CRUDTestExecutor extends TestExecutor {
   }
 
   public void createAndUseDB() throws TException {
+    client.executeStatement("drop database db1;");
+    // make sure database not exist, it's ok to ignore the error
     ExecuteStatementResp resp = client.executeStatement("create database db1;");
-    if (resp.status.code == successStatusCode) {
-      System.out.println("Create database db1 finished");
-    }
+    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    LOGGER.info("Create database db1 finished");
     resp = client.executeStatement("use db1;");
-    if (resp.status.code == successStatusCode) {
-      System.out.println("Use db1 finished");
-    }
+    Assert.assertEquals(Constants.successStatusCode, resp.status.code);
+    LOGGER.info("Use db1 finished");
   }
 
   /*
@@ -97,9 +101,7 @@ public class CRUDTestExecutor extends TestExecutor {
     Set<List<Object>> queryResult = convertData(resp.rowList, tableSchema.types);
     Set<List<Object>> tableData = dataMap.get("test_table1");
 
-    if (!equals(queryResult, tableData)) {
-      System.out.println("Error!");
-    }
+    Assert.assertTrue(equals(queryResult, tableData));
 
     // test2: query with filter for non primary key
     querySql = "select * from test_table2 where column0 = 5;";
@@ -115,9 +117,7 @@ public class CRUDTestExecutor extends TestExecutor {
       }
     }
 
-    if (!equals(queryResult, expectedResult)) {
-      System.out.println("Error!");
-    }
+    Assert.assertTrue(equals(queryResult, expectedResult));
 
     // test3: query with filter for primary key
     querySql = "select * from test_table3 where column3 < 5;";
@@ -133,9 +133,7 @@ public class CRUDTestExecutor extends TestExecutor {
       }
     }
 
-    if (!equals(queryResult, expectedResult)) {
-      System.out.println("Error!");
-    }
+    Assert.assertTrue(equals(queryResult, expectedResult));
 
     //
     //        querySql = "select column1,column3 from test_table2 where column2 = 100;";
@@ -174,9 +172,7 @@ public class CRUDTestExecutor extends TestExecutor {
     Set<List<Object>> queryResult = convertData(resp.rowList, tableSchema.types);
     tableData = dataMap.get("test_table1");
 
-    if (!equals(queryResult, tableData)) {
-      System.out.println("Error!");
-    }
+    Assert.assertTrue(equals(queryResult, tableData));
 
     // update column2 to 100 where column2 = 50;
     updateSql = "update test_table2 set column2 = 100 where column2 = 50;";
@@ -196,9 +192,7 @@ public class CRUDTestExecutor extends TestExecutor {
     queryResult = convertData(resp.rowList, tableSchema.types);
     tableData = dataMap.get("test_table2");
 
-    if (!equals(queryResult, tableData)) {
-      System.out.println("Error!");
-    }
+    Assert.assertTrue(equals(queryResult, tableData));
 
     // update column3 to 100 where column2 = 200;
     updateSql = "update test_table3 set column3 = 100 where column2 = 50;";
@@ -218,9 +212,7 @@ public class CRUDTestExecutor extends TestExecutor {
     queryResult = convertData(resp.rowList, tableSchema.types);
     tableData = dataMap.get("test_table3");
 
-    if (!equals(queryResult, tableData)) {
-      System.out.println("Error!");
-    }
+    Assert.assertTrue(equals(queryResult, tableData));
   }
 
   public static void deleteAndQueryData() {
@@ -306,6 +298,11 @@ public class CRUDTestExecutor extends TestExecutor {
   @Override
   public void close() {
     if (client != null) {
+      try {
+        client.executeStatement("drop database db1;");
+      } catch (TException e) {
+        LOGGER.error("{}", e.getMessage(), e);
+      }
       client.close();
     }
   }
