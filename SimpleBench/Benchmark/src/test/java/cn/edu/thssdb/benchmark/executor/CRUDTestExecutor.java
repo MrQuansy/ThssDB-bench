@@ -33,7 +33,7 @@ public class CRUDTestExecutor extends TestExecutor {
     dataGenerator = new SimpleDataGenerator();
     schemaMap = dataGenerator.getSchemaMap();
     dataMap = new HashMap<>();
-    client = new Client("127.0.0.1", 6667);
+    client = new Client();
   }
 
   public void createAndUseDB() throws TException {

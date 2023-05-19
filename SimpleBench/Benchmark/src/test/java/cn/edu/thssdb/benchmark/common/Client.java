@@ -1,5 +1,6 @@
 package cn.edu.thssdb.benchmark.common;
 
+import cn.edu.thssdb.benchmark.config.Config;
 import cn.edu.thssdb.rpc.thrift.*;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -12,14 +13,14 @@ public class Client {
   private TTransport transport;
   private TProtocol protocol;
 
-  private String userName = "root";
+  private String userName = Config.username;
 
-  private String password = "root";
+  private String password = Config.password;
 
   private long sessionId;
 
-  public Client(String host, int port) throws TException {
-    transport = new TSocket(host, port);
+  public Client() throws TException {
+    transport = new TSocket(Config.host, Config.port);
     transport.open();
     protocol = new TBinaryProtocol(transport);
     client = new IService.Client(protocol);

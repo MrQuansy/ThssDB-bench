@@ -1,33 +1,16 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package cn.edu.thssdb.benchmark.common;
 
 import cn.edu.thssdb.benchmark.generator.BaseDataGenerator;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class TableReadWriteUtil {
 
@@ -51,10 +34,10 @@ public class TableReadWriteUtil {
           "Insert into "
               + tableName
               + "("
-              + StringUtils.join(columns, ",")
+              + join(columns, ",")
               + ")"
               + " values("
-              + StringUtils.join(datas, ",")
+              + join(datas, ",")
               + ");";
       client.executeStatement(sql);
     }
@@ -83,12 +66,53 @@ public class TableReadWriteUtil {
     // check result set
     for (int i = 0; i < resp.rowList.size(); i++) {
       for (int j = 0; j < tableSchema.columns.size(); j++) {
-        Object dataItem = dataGenerator.generateValue(tableSchema.tableName, i, j);
+        int rowId =
+            Integer.parseInt(
+                resp.rowList
+                    .get(i)
+                    .get(
+                        resultColumnToSchemaColumnIndex.indexOf(
+                            tableSchema.primaryKeyColumnIndex)));
+        Object dataItem =
+            dataGenerator.generateValue(
+                tableSchema.tableName, rowId, resultColumnToSchemaColumnIndex.get(j));
         if (dataItem == null) {
           Assert.assertEquals("null", resp.rowList.get(i).get(j));
         } else {
           Assert.assertEquals(dataItem.toString(), resp.rowList.get(i).get(j));
         }
+      }
+    }
+  }
+
+  public static String join(Iterable<?> iterable, String separator) {
+    return iterable == null ? null : join(iterable.iterator(), separator);
+  }
+
+  public static String join(Iterator<?> iterator, String separator) {
+    if (iterator == null) {
+      return null;
+    } else if (!iterator.hasNext()) {
+      return "";
+    } else {
+      Object first = iterator.next();
+      if (!iterator.hasNext()) {
+        return Objects.toString(first, "");
+      } else {
+        StringBuilder buf = new StringBuilder(256);
+        if (first != null) {
+          buf.append(first);
+        }
+        while (iterator.hasNext()) {
+          if (separator != null) {
+            buf.append(separator);
+          }
+          Object obj = iterator.next();
+          if (obj != null) {
+            buf.append(obj);
+          }
+        }
+        return buf.toString();
       }
     }
   }
