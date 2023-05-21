@@ -17,7 +17,7 @@ public class TransactionTest {
     transactionTestExecutor = new TransactionTestExecutor();
     LOGGER.info("======================== Create database  ======================== ");
     transactionTestExecutor.createAndUseDB();
-    LOGGER.info("======================== Prepare adata  ======================== ");
+    LOGGER.info("======================== Prepare data  ======================== ");
     transactionTestExecutor.prepareData();
   }
 

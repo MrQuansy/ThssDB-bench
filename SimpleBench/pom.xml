@@ -12,6 +12,7 @@
     <modules>
         <module>ThssDB</module>
         <module>Benchmark</module>
+        <module>ThssDB-perfect</module>
     </modules>
 
     <properties>
