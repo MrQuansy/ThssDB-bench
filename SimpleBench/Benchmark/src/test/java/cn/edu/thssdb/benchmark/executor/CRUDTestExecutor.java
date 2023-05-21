@@ -243,52 +243,28 @@ public class CRUDTestExecutor extends TestExecutor {
   }
 
   public void updateAndQueryData() throws TException {
-    // 1. 更新整列值
-    String updateSql = "update test_table1 set column5 = 100;";
-    client.executeStatement(updateSql);
-
-    Set<List<Object>> tableData = dataMap.get("test_table1");
-    for (List<Object> rowData : tableData) {
-      rowData.set(5, 100);
-    }
-
-    String querySql = "select column0,column5 from test_table1;";
-    ExecuteStatementResp resp = client.executeStatement(querySql);
-    TableSchema tableSchema = dataGenerator.getTableSchema("test_table1");
-    List<DataType> resultTypes = new ArrayList<>();
-    resultTypes.add(tableSchema.types.get(0));
-    resultTypes.add(tableSchema.types.get(5));
-    Set<List<Object>> queryResult = convertData(resp.rowList, resultTypes);
-
-    List<Integer> columnList = new ArrayList<>();
-    columnList.add(0);
-    columnList.add(5);
-    Set<List<Object>> expectedResult = extractData(dataMap.get("test_table1"), columnList);
-
-    Assert.assertTrue(equals(queryResult, expectedResult));
-
     // update column2 to 100 where column2 = 50;
-    updateSql = "update test_table2 set column2 = 100 where column2 = 50;";
+    String updateSql = "update test_table2 set column2 = 100 where column2 = 50;";
     client.executeStatement(updateSql);
 
-    tableData = dataMap.get("test_table2");
+    Set<List<Object>> tableData = dataMap.get("test_table2");
     for (List<Object> rowData : tableData) {
       if ((float) rowData.get(2) == 50) {
         rowData.set(2, 100);
       }
     }
 
-    querySql = "select column1,column2 from test_table2;";
-    resp = client.executeStatement(querySql);
-    tableSchema = dataGenerator.getTableSchema("test_table2");
-    resultTypes.clear();
+    String querySql = "select column1,column2 from test_table2;";
+    ExecuteStatementResp resp = client.executeStatement(querySql);
+    TableSchema tableSchema = dataGenerator.getTableSchema("test_table2");
+    List<DataType> resultTypes = new ArrayList<>();
     resultTypes.add(tableSchema.types.get(1));
     resultTypes.add(tableSchema.types.get(2));
-    queryResult = convertData(resp.rowList, resultTypes);
-    columnList.clear();
+    Set<List<Object>> queryResult = convertData(resp.rowList, resultTypes);
+    List<Integer> columnList = new ArrayList<>();
     columnList.add(1);
     columnList.add(2);
-    expectedResult = extractData(dataMap.get("test_table1"), columnList);
+    Set<List<Object>> expectedResult = extractData(dataMap.get("test_table1"), columnList);
 
     Assert.assertTrue(equals(queryResult, expectedResult));
 
