@@ -21,7 +21,7 @@ public class Global {
   public static final String DATABASE_EMPTY = "EMPTY_DATABASE";
   public static final String ENTRY_NULL = "null";
 
-  public static final String DBMS_DIR = "thssdb";
+  public static final String DBMS_DIR = "thssdb-perfect";
   public static final String META_SUFFIX = "_meta";
 
   public static final String LOG_BEGIN_TRANSACTION = "begin transaction";
