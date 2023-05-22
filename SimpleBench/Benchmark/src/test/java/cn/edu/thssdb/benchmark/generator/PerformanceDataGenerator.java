@@ -51,13 +51,13 @@ public class PerformanceDataGenerator extends BaseDataGenerator {
   public Object generateValue(String tableName, int rowId, int columnId) {
     switch (schemaMap.get(tableName).types.get(columnId)) {
       case INT:
-        return random.nextInt();
+        return Math.abs(random.nextInt());
       case LONG:
-        return random.nextLong();
+        return Math.abs(random.nextLong());
       case DOUBLE:
-        return random.nextDouble();
+        return Math.abs(random.nextDouble());
       case FLOAT:
-        return random.nextFloat();
+        return Math.abs(random.nextFloat());
       case STRING:
         return String.format(stringFormat, rowId);
     }
