@@ -24,7 +24,7 @@ public class CRUDTest {
   }
 
   @Test
-  public void simpleTest() throws TException {
+  public void crudTest() throws TException {
     // create database
     LOGGER.info("======================== Create database  ======================== ");
     CRUDTestExecutor.createAndUseDB();

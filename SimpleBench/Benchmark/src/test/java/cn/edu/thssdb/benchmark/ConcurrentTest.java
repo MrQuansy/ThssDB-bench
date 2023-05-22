@@ -24,7 +24,7 @@ public class ConcurrentTest {
   }
 
   @Test
-  public void simpleTest() throws TException {
+  public void concurrentTest() throws TException {
     // create database
     LOGGER.info("======================== Create database  ======================== ");
     concurrentTestExecutor.createAndUseDB();
