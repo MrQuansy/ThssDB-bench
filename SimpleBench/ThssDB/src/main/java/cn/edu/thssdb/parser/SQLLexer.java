@@ -3,11 +3,11 @@
 package cn.edu.thssdb.parser;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SQLLexer extends Lexer {
@@ -283,7 +283,9 @@ public class SQLLexer extends Lexer {
   private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
   public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
-  /** @deprecated Use {@link #VOCABULARY} instead. */
+  /**
+   * @deprecated Use {@link #VOCABULARY} instead.
+   */
   @Deprecated public static final String[] tokenNames;
 
   static {
