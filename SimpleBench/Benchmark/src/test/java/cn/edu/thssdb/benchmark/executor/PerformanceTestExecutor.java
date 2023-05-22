@@ -4,7 +4,7 @@ import cn.edu.thssdb.benchmark.common.Client;
 import cn.edu.thssdb.benchmark.common.Constants;
 import cn.edu.thssdb.benchmark.common.TableSchema;
 import cn.edu.thssdb.benchmark.generator.BaseDataGenerator;
-import cn.edu.thssdb.benchmark.generator.SimpleDataGenerator;
+import cn.edu.thssdb.benchmark.generator.PerformanceDataGenerator;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import com.clearspring.analytics.stream.quantile.TDigest;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ public class PerformanceTestExecutor extends TestExecutor {
   private Map<Integer, Measurement> measurements = new HashMap<>();
 
   public PerformanceTestExecutor() throws TException {
-    dataGenerator = new SimpleDataGenerator();
+    dataGenerator = new PerformanceDataGenerator();
     schemaMap = dataGenerator.getSchemaMap();
     clients = new ArrayList<>();
     for (Operation operation : Operation.values()) {
