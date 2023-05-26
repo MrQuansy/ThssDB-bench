@@ -63,9 +63,7 @@ public class Table implements Iterable<Row> {
     return columns.toArray(new Column[0]);
   }
 
-  /**
-   * @description: 从内存中恢复数据
-   */
+  /** @description: 从内存中恢复数据 */
   private void recover() {
     try {
       File dir = new File(DATA_DIRECTORY);

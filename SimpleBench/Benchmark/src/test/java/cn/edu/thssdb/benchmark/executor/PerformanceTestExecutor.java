@@ -36,7 +36,7 @@ public class PerformanceTestExecutor extends TestExecutor {
   private Map<Integer, Measurement> measurements = new HashMap<>();
 
   public PerformanceTestExecutor() throws TException {
-    dataGenerator = new PerformanceDataGenerator();
+    dataGenerator = new PerformanceDataGenerator(10);
     schemaMap = dataGenerator.getSchemaMap();
     clients = new ArrayList<>();
     for (Operation operation : Operation.values()) {
