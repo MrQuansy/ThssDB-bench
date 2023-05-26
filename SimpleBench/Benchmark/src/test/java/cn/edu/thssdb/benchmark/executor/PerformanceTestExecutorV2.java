@@ -26,35 +26,27 @@ import java.util.concurrent.CompletableFuture;
 
 public class PerformanceTestExecutorV2 extends TestExecutor {
   private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceTestExecutorV2.class);
-  private static final int COMPRESSION = 3000;
   private static final int DATA_SEED = 667;
-  private List<Client> clients;
-  private Random random = new Random(DATA_SEED);
-
   private static final Map<TransactionType, TDigest> transactionLatencyDigest =
       new EnumMap<>(TransactionType.class);
+  private List<Client> clients;
   private Map<Integer, PerformanceTestExecutorV2.Measurement> measurements = new HashMap<>();
   private int CLIENT_NUMBER = 5;
-
   private int TABLE_NUMBER = 3;
-
   private int TRANSACTION_NUMBER = 1000;
-
   private String OPERATION_RATIO = "1:1:1:1";
 
-  TransactionGenerator transactionGenerator;
   BaseDataGenerator dataGenerator;
   WeightedRandomPicker weightedRandomPicker;
 
   public PerformanceTestExecutorV2() throws TException {
     dataGenerator = new PerformanceDataGenerator(TABLE_NUMBER);
-    transactionGenerator = new TransactionGenerator(dataGenerator);
     weightedRandomPicker =
         new WeightedRandomPicker(
             Arrays.stream(OPERATION_RATIO.split(":")).mapToInt(Integer::parseInt).toArray());
     clients = new ArrayList<>();
     for (TransactionType type : TransactionType.values()) {
-      transactionLatencyDigest.put(type, new TDigest(COMPRESSION, new Random(DATA_SEED)));
+      transactionLatencyDigest.put(type, new TDigest(3000, new Random(DATA_SEED)));
     }
     for (int number = 0; number < CLIENT_NUMBER; number++) {
       clients.add(new Client());
@@ -87,6 +79,8 @@ public class PerformanceTestExecutorV2 extends TestExecutor {
           CompletableFuture.runAsync(
               () -> {
                 try {
+                  TransactionGenerator transactionGenerator =
+                      new TransactionGenerator(dataGenerator, DATA_SEED);
                   LOGGER.info("Start Performance Test for Client-" + index);
                   Client client = clients.get(index);
                   PerformanceTestExecutorV2.Measurement measurement = measurements.get(index);

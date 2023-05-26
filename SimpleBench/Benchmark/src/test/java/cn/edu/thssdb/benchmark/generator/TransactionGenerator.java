@@ -11,8 +11,8 @@ public class TransactionGenerator {
   private SQLGenerator sqlGenerator;
   private TransactionFactory transactionFactory;
 
-  public TransactionGenerator(BaseDataGenerator dataGenerator) {
-    sqlGenerator = new SQLGenerator(dataGenerator);
+  public TransactionGenerator(BaseDataGenerator dataGenerator, int dataSeed) {
+    sqlGenerator = new SQLGenerator(dataGenerator, dataSeed);
     transactionFactory = new TransactionFactory(sqlGenerator);
   }
 

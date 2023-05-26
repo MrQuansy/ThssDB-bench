@@ -10,7 +10,7 @@ public class Transaction {
     this.sqlList = sqlList;
   }
 
-  public void execute(Client client) throws TException {
+  public synchronized void execute(Client client) throws TException {
     // todo merge these statements in one rpc
     client.executeStatement("begin transaction;");
     for (String sql : sqlList) {

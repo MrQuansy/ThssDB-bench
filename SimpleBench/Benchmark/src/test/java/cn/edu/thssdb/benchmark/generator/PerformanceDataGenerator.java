@@ -17,6 +17,7 @@ public class PerformanceDataGenerator extends BaseDataGenerator {
 
   public PerformanceDataGenerator(int tableNum) {
     this.tableNum = tableNum;
+    initTableSchema();
   }
 
   @Override
