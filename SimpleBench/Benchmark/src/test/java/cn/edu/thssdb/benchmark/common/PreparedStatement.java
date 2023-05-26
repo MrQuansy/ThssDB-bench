@@ -7,12 +7,10 @@ public class PreparedStatement {
 
   private final String sql;
   private final List<Object> params;
-  private final int placeholderCount;
 
   public PreparedStatement(String sql) {
     this.sql = sql;
     this.params = new ArrayList<>();
-    placeholderCount = countPlaceholders(sql);
   }
 
   public PreparedStatement setString(int index, String value) {
@@ -26,10 +24,6 @@ public class PreparedStatement {
   }
 
   private void addParam(int index, Object value) {
-    if (index > placeholderCount) {
-      throw new RuntimeException("Index out of range");
-    }
-
     int paramIndex = index;
     if (params.size() > paramIndex) {
       params.set(paramIndex, value);

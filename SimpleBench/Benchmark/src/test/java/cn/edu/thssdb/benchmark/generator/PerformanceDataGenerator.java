@@ -41,6 +41,9 @@ public class PerformanceDataGenerator extends BaseDataGenerator {
 
   @Override
   public Object generateValue(String tableName, int rowId, int columnId) {
+    if (columnId == 0) {
+      return rowId;
+    }
     switch (schemaMap.get(tableName).types.get(columnId)) {
       case INT:
         return Math.abs(random.nextInt());

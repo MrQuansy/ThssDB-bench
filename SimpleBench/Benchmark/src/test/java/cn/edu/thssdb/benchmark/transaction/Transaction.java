@@ -11,12 +11,15 @@ public class Transaction {
   }
 
   public synchronized void execute(Client client) throws TException {
-    // todo merge these statements in one rpc
-    client.executeStatement("begin transaction;");
-    for (String sql : sqlList) {
-      client.executeStatement(sql);
+    if (sqlList.length == 1) {
+      client.executeStatement(sqlList[0]);
+    } else {
+      client.executeStatement("begin transaction;");
+      for (String sql : sqlList) {
+        client.executeStatement(sql);
+      }
+      client.executeStatement("commit;");
     }
-    client.executeStatement("commit;");
   }
 
   public int getSize() {
