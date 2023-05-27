@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SimpleDataGenerator extends BaseDataGenerator {
 
-  private String stringFormat = "'%0" + Constants.stringLength + "d'";
+  private String stringFormat = "%0" + Constants.stringLength + "d";
 
   @Override
   protected void initTableSchema() {
