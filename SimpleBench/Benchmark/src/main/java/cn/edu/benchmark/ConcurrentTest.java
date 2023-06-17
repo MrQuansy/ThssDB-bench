@@ -3,7 +3,6 @@ package cn.edu.benchmark;
 import cn.edu.benchmark.executor.ConcurrentTestExecutor;
 import org.apache.thrift.TException;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,6 +35,5 @@ public class ConcurrentTest {
     LOGGER.info(
         "======================== Concurrent insert and query data ========================");
     concurrentTestExecutor.concurrentInsertAndQuery();
-    Assert.fail();
   }
 }

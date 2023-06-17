@@ -2,7 +2,6 @@ package cn.edu.benchmark;
 
 import cn.edu.benchmark.executor.TransactionTestExecutor;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -31,7 +30,6 @@ public class TransactionTest {
   public void testLostUpdate() throws Exception {
     LOGGER.info("======================== Lost update ========================");
     transactionTestExecutor.testLostUpdate();
-    Assert.fail();
   }
 
   @Test
