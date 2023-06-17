@@ -3,6 +3,7 @@ package cn.edu.thssdb.benchmark;
 import cn.edu.thssdb.benchmark.executor.ConcurrentTestExecutor;
 import org.apache.thrift.TException;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,5 +36,6 @@ public class ConcurrentTest {
     LOGGER.info(
         "======================== Concurrent insert and query data ========================");
     concurrentTestExecutor.concurrentInsertAndQuery();
+    Assert.fail();
   }
 }

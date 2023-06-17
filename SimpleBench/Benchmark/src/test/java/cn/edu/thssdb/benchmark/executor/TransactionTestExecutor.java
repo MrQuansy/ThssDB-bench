@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 
 public class TransactionTestExecutor extends TestExecutor {
 
@@ -58,6 +59,7 @@ public class TransactionTestExecutor extends TestExecutor {
     CompletableFuture<Void> future;
     client1.executeStatement("begin transaction");
     client2.executeStatement("begin transaction");
+    Semaphore semaphore = new Semaphore(0);
     try {
       client1.executeStatement("update tx set count = 1 where id = 0;");
       future =
@@ -69,11 +71,7 @@ public class TransactionTestExecutor extends TestExecutor {
                   e.printStackTrace();
                   throw new RuntimeException(e);
                 } finally {
-                  try {
-                    client2.executeStatement("commit;");
-                  } catch (TException e) {
-                    throw new RuntimeException(e);
-                  }
+                  semaphore.release();
                 }
               });
       Thread.sleep(1000);
@@ -83,6 +81,8 @@ public class TransactionTestExecutor extends TestExecutor {
 
     } finally {
       client1.executeStatement("commit;");
+      semaphore.acquire();
+      client2.executeStatement("commit;");
     }
     future.get();
   }
@@ -91,6 +91,7 @@ public class TransactionTestExecutor extends TestExecutor {
     CompletableFuture<Void> future;
     client2.executeStatement("begin transaction");
     client1.executeStatement("begin transaction");
+    Semaphore semaphore = new Semaphore(0);
     try {
       queryAndCheckOneColumn(
           client1, "select count from tx where id = 1;", Collections.singletonList("1"));
@@ -109,17 +110,87 @@ public class TransactionTestExecutor extends TestExecutor {
                   e.printStackTrace();
                   throw new RuntimeException(e);
                 } finally {
-                  try {
-                    client2.executeStatement("commit;");
-                  } catch (TException e) {
-                    throw new RuntimeException(e);
-                  }
+                  semaphore.release();
                 }
               });
       Thread.sleep(1000);
       client1.executeStatement("update tx set count = 1 where id = 1;");
     } finally {
       client1.executeStatement("commit;");
+      semaphore.acquire();
+      client2.executeStatement("commit;");
+    }
+    future.get();
+  }
+
+  public void testRepeatRead() throws Exception {
+    CompletableFuture<Void> future;
+    client2.executeStatement("begin transaction");
+    client1.executeStatement("begin transaction");
+    Semaphore semaphore = new Semaphore(0);
+    try {
+      queryAndCheckOneColumn(
+          client1, "select count from tx where id = 2;", Collections.singletonList("2"));
+      LOGGER.info("Init value of table1(id=2) is 2");
+      client1.executeStatement("update tx set count = 100 where id = 1;");
+      future =
+          CompletableFuture.runAsync(
+              () -> {
+                try {
+                  client2.executeStatement("update tx set count = 100 where id = 2;");
+                  LOGGER.info("Update value of table1(id=2) to 100.");
+                } catch (TException e) {
+                  e.printStackTrace();
+                  throw new RuntimeException(e);
+                } finally {
+                  semaphore.release();
+                }
+              });
+      Thread.sleep(1000);
+
+      queryAndCheckOneColumn(
+          client1, "select count from tx where id = 2;", Collections.singletonList("2"));
+      LOGGER.info("Repeat read value of table1(id=2) is 2");
+    } finally {
+      client1.executeStatement("commit;");
+      semaphore.acquire();
+      client2.executeStatement("commit;");
+    }
+    future.get();
+  }
+
+  public void testPhantomRead() throws Exception {
+    CompletableFuture<Void> future;
+    client2.executeStatement("begin transaction");
+    client1.executeStatement("begin transaction");
+    Semaphore semaphore = new Semaphore(0);
+    try {
+      ExecuteStatementResp resp = client1.executeStatement("select count from tx;");
+      Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
+      Assert.assertEquals(5, resp.rowList.size());
+      LOGGER.info("Init size of table is 5");
+      future =
+          CompletableFuture.runAsync(
+              () -> {
+                try {
+                  client2.executeStatement("insert into tx(id, count) values(6, 6);");
+                  LOGGER.info("Insert into table");
+                } catch (TException e) {
+                  e.printStackTrace();
+                  throw new RuntimeException(e);
+                } finally {
+                  semaphore.release();
+                }
+              });
+      Thread.sleep(1000);
+      resp = client1.executeStatement("select count from tx;");
+      Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
+      Assert.assertEquals(5, resp.rowList.size());
+      LOGGER.info("Init size of table is 5");
+    } finally {
+      client1.executeStatement("commit;");
+      semaphore.acquire();
+      client2.executeStatement("commit;");
     }
     future.get();
   }
