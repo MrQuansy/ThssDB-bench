@@ -19,7 +19,8 @@ public class CSVGenerator {
       // Write rows
       for (int groupNumber = 1; groupNumber <= 40; groupNumber++) {
         StringBuilder rowBuilder = new StringBuilder();
-        rowBuilder.append(groupNumber).append(",1,1,1,1,1,1,1,1,1,1,1,1,1");
+        //        rowBuilder.append(groupNumber).append(",1,1,1,1,1,1,1,1,1,1,1,1,1");
+        rowBuilder.append(groupNumber).append(",0,0,0,0,0,0,0,0,0,0,0,0,0");
         writer.write(rowBuilder.toString());
         writer.newLine();
       }

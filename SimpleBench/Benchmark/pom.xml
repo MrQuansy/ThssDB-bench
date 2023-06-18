@@ -82,7 +82,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>cn.edu.benchmark.Main</mainClass> <!-- 指定主类 -->
+                            <mainClass>cn.edu.benchmark.Performance</mainClass> <!-- 指定主类 -->
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -102,8 +102,8 @@ public class Main {
       System.out.println("Invalid GroupNumber. Please provide a valid integer value.");
       return;
     }
-    if (groupNumber < 1 || groupNumber > 39) {
-      System.out.println("GroupNumber should be between 1 and 39.");
+    if (groupNumber < 1 || groupNumber > 40) {
+      System.out.println("GroupNumber should be between 1 and 40.");
       return;
     }
     if (!level.equals("S") && !level.equals("RC")) {
@@ -160,8 +160,9 @@ public class Main {
 
   private static void updateCsvFile(int groupNumber, String level, List<Integer> testResult)
       throws IOException {
-    File csvFile = new File("path_to_your_csv_file.csv");
-    File tempFile = new File("temp.csv");
+    String workDir = "/opt/test/";
+    File csvFile = new File(workDir, "path_to_your_csv_file.csv");
+    File tempFile = new File(workDir, "temp.csv");
     BufferedReader reader = new BufferedReader(new FileReader(csvFile));
     BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
