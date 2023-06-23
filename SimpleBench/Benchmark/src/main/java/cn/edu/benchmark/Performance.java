@@ -73,6 +73,7 @@ public class Performance {
    * @return 运行时间
    */
   private static long run(int memory) {
+    long startTime = System.currentTimeMillis();
     CompletableFuture<Result> future =
         CompletableFuture.supplyAsync(
             () -> {
@@ -84,7 +85,7 @@ public class Performance {
       Result testResult = future.get(MEMORY_TIME.get(memory), TimeUnit.MINUTES);
       if (testResult.wasSuccessful()) {
         System.out.println("All tests passed successfully.");
-        return testResult.getRunTime();
+        return System.currentTimeMillis() - startTime;
       } else {
         System.out.println("Test failures:");
         return DEFAULT_MAX;
