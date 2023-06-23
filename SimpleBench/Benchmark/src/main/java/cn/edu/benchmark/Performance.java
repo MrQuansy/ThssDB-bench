@@ -43,7 +43,7 @@ public class Performance {
     MEMORY_INDEX.put(100, 12);
     MEMORY_INDEX.put(500, 13);
     MEMORY_TIME.put(50, 5);
-    MEMORY_TIME.put(100, 5);
+    MEMORY_TIME.put(100, 10);
     MEMORY_TIME.put(500, 10);
   }
 
@@ -69,7 +69,9 @@ public class Performance {
     updateCsvFile(groupNumber, memory, testResult);
   }
 
-  /** @return 运行时间 */
+  /**
+   * @return 运行时间
+   */
   private static long run(int memory) {
     CompletableFuture<Result> future =
         CompletableFuture.supplyAsync(

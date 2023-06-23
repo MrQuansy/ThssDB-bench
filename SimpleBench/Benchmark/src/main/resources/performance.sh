@@ -10,6 +10,7 @@ function cleanup_and_terminate() {
 
     # Cleanup temporary directory and OS cache
     rm -rf "$2"
+    # TODO cpu cache
     sync
 }
 
