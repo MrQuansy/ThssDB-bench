@@ -3,6 +3,8 @@ package cn.edu.benchmark.generator;
 import cn.edu.benchmark.common.PreparedStatement;
 import cn.edu.benchmark.common.TableSchema;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SQLGenerator {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SQLGenerator.class);
   BaseDataGenerator dataGenerator;
   List<TableSchema> tableSchemaList;
   int tableNum;
@@ -47,7 +50,7 @@ public class SQLGenerator {
             + ") values ("
             + StringUtils.join(data, ",")
             + ");";
-    System.out.println(insertSQL);
+    LOGGER.debug(insertSQL);
     return insertSQL;
   }
 
@@ -62,7 +65,7 @@ public class SQLGenerator {
     updateStatement.setString(1, column);
     updateStatement.setString(2, dataItem.toString());
     updateStatement.setString(3, String.valueOf(random.nextInt(rowNumber)));
-    System.out.println(updateStatement.getSQL());
+    LOGGER.debug(updateStatement.getSQL());
     return updateStatement.getSQL();
   }
 
@@ -72,7 +75,7 @@ public class SQLGenerator {
     int rowNumber = rowNumberMap.get(tableSchema.tableName).getAndIncrement();
     deleteStatement.setString(0, tableSchema.tableName);
     deleteStatement.setString(1, String.valueOf(random.nextInt(rowNumber)));
-    System.out.println(deleteStatement.getSQL());
+    LOGGER.debug(deleteStatement.getSQL());
     return deleteStatement.getSQL();
   }
 
@@ -85,7 +88,7 @@ public class SQLGenerator {
     queryStatement.setString(1, tableSchema.tableName);
     int rowNumber = rowNumberMap.get(tableSchema.tableName).getAndIncrement();
     queryStatement.setString(2, String.valueOf(random.nextInt(rowNumber)));
-    System.out.println(queryStatement.getSQL());
+    LOGGER.debug(queryStatement.getSQL());
     return queryStatement.getSQL();
   }
 
@@ -107,7 +110,7 @@ public class SQLGenerator {
     joinStatement.setString(4, tableSchema2.tableName + ".id");
     joinStatement.setString(5, tableSchema1.tableName + ".id");
     joinStatement.setString(6, String.valueOf(random.nextInt(rowNumber)));
-    System.out.println(joinStatement.getSQL());
+    LOGGER.debug(joinStatement.getSQL());
     return joinStatement.getSQL();
   }
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the path to the test.jar file
-TEST_JAR_PATH="/Users/chenyanze/Downloads/test/Benchmark-1.1-SNAPSHOT-jar-with-dependencies.jar"
+TEST_JAR_PATH="/Users/zhanghongyin/Downloads/test/Benchmark-1.1-SNAPSHOT-jar-with-dependencies.jar"
 
 # Function to cleanup and terminate the process
 function cleanup_and_terminate() {

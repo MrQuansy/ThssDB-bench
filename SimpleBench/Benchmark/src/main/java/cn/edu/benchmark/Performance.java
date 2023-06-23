@@ -100,7 +100,7 @@ public class Performance {
   private static void updateCsvFile(int groupNumber, int memory, long testResult)
       throws IOException {
     //    String workDir = "/opt/test/";
-    String workDir = "/Users/chenyanze/Downloads/test/";
+    String workDir = "/Users/zhanghongyin/Downloads/test/";
     File csvFile = new File(workDir, "path_to_your_csv_file.csv");
     File tempFile = new File(workDir, "temp.csv");
     BufferedReader reader = new BufferedReader(new FileReader(csvFile));

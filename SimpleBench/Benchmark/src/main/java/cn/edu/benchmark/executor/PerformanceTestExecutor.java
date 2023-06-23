@@ -63,12 +63,12 @@ public class PerformanceTestExecutor extends TestExecutor {
     // make sure database not exist, it's ok to ignore the error
     ExecuteStatementResp resp1 = schemaClient.executeStatement("create database db_performance;");
     Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp1.status.code);
-    LOGGER.info("Create database db_performance finished");
+    LOGGER.debug("Create database db_performance finished");
     for (int i = 0; i < CLIENT_NUMBER; i++) {
       Client client = clients.get(i);
       ExecuteStatementResp resp2 = client.executeStatement("use db_performance;");
       Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp2.status.code);
-      LOGGER.info("Client-" + i + " use db_performance finished");
+      LOGGER.debug("Client-" + i + " use db_performance finished");
     }
     for (TableSchema tableSchema : dataGenerator.getSchemaMap().values()) {
       createTable(tableSchema, clients.get(0));
@@ -83,7 +83,7 @@ public class PerformanceTestExecutor extends TestExecutor {
           CompletableFuture.runAsync(
               () -> {
                 try {
-                  LOGGER.info("Start Performance Test for Client-" + index);
+                  LOGGER.debug("Start Performance Test for Client-" + index);
                   Client client = clients.get(index);
                   PerformanceTestExecutor.Measurement measurement = measurements.get(index);
                   for (int m = 0; m < OPERATION_NUMBER; m++) {
@@ -96,7 +96,7 @@ public class PerformanceTestExecutor extends TestExecutor {
                     measurement.record(
                         type, transaction.getTransactionSize(), finishTime - startTime);
                   }
-                  LOGGER.info("Finish Performance Test for Client-" + index);
+                  LOGGER.debug("Finish Performance Test for Client-" + index);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
@@ -105,7 +105,7 @@ public class PerformanceTestExecutor extends TestExecutor {
     }
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     long endTestTime = System.currentTimeMillis();
-    LOGGER.info("Finish performance test after {} ms", endTestTime - startTestTime);
+    LOGGER.debug("Finish performance test after {} ms", endTestTime - startTestTime);
 
     // calculate measurement
     List<Double> quantiles = Arrays.asList(0.0, 0.25, 0.5, 0.75, 0.9, 0.99, 1.0);
@@ -122,21 +122,21 @@ public class PerformanceTestExecutor extends TestExecutor {
       }
       allOperationNumber += totalNumber;
       allLatencyNumber += totalLatency;
-      LOGGER.info(type + " operation count: " + totalNumber);
-      LOGGER.info(type + " per second: " + (totalNumber / (totalLatency / 1e9)));
+      LOGGER.debug(type + " operation count: " + totalNumber);
+      LOGGER.debug(type + " per second: " + (totalNumber / (totalLatency / 1e9)));
       try {
         List<Double> results = new ArrayList<>();
         for (Double quantile : quantiles) {
           results.add(digest.quantile(quantile));
         }
         for (int i = 0; i < quantiles.size(); i++) {
-          LOGGER.info(type + "-" + quantiles.get(i) + ": " + (results.get(i) / 1e6) + " ms");
+          LOGGER.debug(type + "-" + quantiles.get(i) + ": " + (results.get(i) / 1e6) + " ms");
         }
       } catch (Exception ignored) {
       }
     }
-    LOGGER.info("Total operation count: {}", allOperationNumber);
-    LOGGER.info("Avg latency of all operations:{} ns", (allLatencyNumber / (allOperationNumber)));
+    LOGGER.debug("Total operation count: {}", allOperationNumber);
+    LOGGER.debug("Avg latency of all operations:{} ns", (allLatencyNumber / (allOperationNumber)));
   }
 
   @Override
