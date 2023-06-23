@@ -30,9 +30,9 @@ public abstract class TestExecutor {
         .append(tableSchema.columns.get(tableSchema.primaryKeyColumnIndex))
         .append(")");
     sb.append(");");
-    LOGGER.info(sb.toString());
+    LOGGER.debug(sb.toString());
     ExecuteStatementResp resp = client.executeStatement(sb.toString());
     Assert.assertEquals(Constants.SUCCESS_STATUS_CODE, resp.status.code);
-    LOGGER.info("create table " + tableSchema.tableName + " finished!");
+    LOGGER.debug("create table " + tableSchema.tableName + " finished!");
   }
 }
